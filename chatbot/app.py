@@ -16,7 +16,7 @@ def chat():
     try:
         # Run Ollama CLI with the Llama model
         response = subprocess.check_output(
-            ['ollama', 'run', 'llama3.2:1b', f"summarize this text:{user_input}"],
+            ['ollama', 'run', 'llama3.2:1b', f"{user_input}"],
             text=True
         )
         return jsonify({'response': response.strip()})
