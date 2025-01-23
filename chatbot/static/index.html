@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Talha GPT</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        .sidebar {
+            width: 260px;
+            background-color: #171923;
+            border-right: 1px solid #2d3748;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .branding {
+            color: #fff;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #2d3748;
+        }
+
+        .new-chat-btn {
+            background-color: #2d3748;
+            color: #fff;
+            border: 1px solid #4a5568;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .new-chat-btn:hover {
+            background-color: #3a4556;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px 0;
+        }
+
+        .message-wrapper {
+            padding: 24px 32px;
+            transition: background-color 0.2s;
+        }
+
+        .message-wrapper:hover {
+            background-color: #1a202c;
+        }
+
+        .message {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            gap: 24px;
+            line-height: 1.6;
+        }
+
+        .avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-weight: 500;
+        }
+
+        .user-avatar {
+            background-color: #4a5568;
+            color: #fff;
+        }
+
+        .bot-avatar {
+            background-color: #00a67d;
+            color: #fff;
+        }
+
+        .message-content {
+            flex: 1;
+            color: #e2e8f0;
+            font-size: 16px;
+        }
+
+        .user-section {
+            background-color: #171923;
+        }
+
+        .input-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 24px 32px;
+            position: relative;
+        }
+
+        .input-box {
+            background-color: #242933;
+            border: 1px solid #4a5568;
+            border-radius: 12px;
+            padding: 16px;
+            width: 100%;
+            min-height: 60px;
+            color: #fff;
+            font-size: 16px;
+            line-height: 1.5;
+            resize: none;
+            outline: none;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-box:focus {
+            border-color: #00a67d;
+            box-shadow: 0 0 0 2px rgba(0, 166, 125, 0.2);
+        }
+
+        .send-button {
+            position: absolute;
+            right: 44px;
+            bottom: 36px;
+            background-color: #00a67d;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .send-button:hover {
+            background-color: #008f6b;
+        }
+
+        .send-button:disabled {
+            background-color: #4a5568;
+            cursor: not-allowed;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 24px 32px;
+            color: #a0aec0;
+            font-size: 14px;
+        }
+
+        body {
+            background-color: #0f1116;
+            color: #fff;
+            height: 100vh;
+            display: flex;
+        }
+
+        /* ... (keep all previous styles) ... */
+
+        .message-content {
+            flex: 1;
+            color: #e2e8f0;
+            font-size: 16px;
+            white-space: pre-wrap;
+        }
+
+        /* Code block styling */
+        .message-content pre {
+            background: #1a1e24 !important;
+            border-radius: 8px;
+            margin: 10px 0;
+            padding: 12px !important;
+            overflow-x: auto;
+        }
+
+        .message-content pre code {
+            background: none !important;
+            color: #e2e8f0;
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            tab-size: 4;
+        }
+
+        /* Inline code styling */
+        .message-content code:not(pre code) {
+            background: #2d3748;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+            color: #e2e8f0;
+        }
+
+        /* Copy button for code blocks */
+        .copy-button {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            background: #2d3748;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            color: #e2e8f0;
+            font-size: 12px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .message-content pre:hover .copy-button {
+            opacity: 1;
+        }
+
+        .copy-button:hover {
+            background: #4a5568;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .message-wrapper {
+                padding: 20px 16px;
+            }
+
+            .input-container {
+                padding: 16px;
+            }
+
+            .send-button {
+                right: 28px;
+                bottom: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="branding">Talha GPT</div>
+        <button class="new-chat-btn">
+            <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="16" width="16"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            New Chat
+        </button>
+    </div>
+    
+    <div class="main-content">
+        <div class="chat-container" id="chat-container">
+            <div class="message-wrapper">
+                <div class="message">
+                    <div class="avatar bot-avatar">T</div>
+                    <div class="message-content">
+                        Hello! I'm Talha GPT. How can I assist you today?
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="typing-indicator" id="typing-indicator">
+            Talha GPT is thinking...
+        </div>
+
+        <div class="user-section">
+            <div class="input-container">
+                <textarea 
+                    id="user-input" 
+                    class="input-box" 
+                    placeholder="Message Talha GPT..." 
+                    rows="1"
+                    onInput="autoResize(this)"
+                ></textarea>
+                <button class="send-button" id="send-button" onclick="sendMessage()">
+                    <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="16" width="16"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+    <!-- Add common language supports -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-jsx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    
+    
+    <script>
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+        const chatContainer = document.getElementById('chat-container');
+        const typingIndicator = document.getElementById('typing-indicator');
+
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = textarea.scrollHeight + 'px';
+        }
+
+        userInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        function appendMessage(content, isUser) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'message-wrapper';
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            
+            const avatar = document.createElement('div');
+            avatar.className = `avatar ${isUser ? 'user-avatar' : 'bot-avatar'}`;
+            avatar.textContent = isUser ? 'U' : 'T';
+            
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+            messageContent.textContent = content;
+            
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(messageContent);
+            wrapper.appendChild(messageDiv);
+            chatContainer.appendChild(wrapper);
+            
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            // Disable input and button while processing
+            userInput.disabled = true;
+            sendButton.disabled = true;
+
+            // Add user message
+            appendMessage(message, true);
+            userInput.value = '';
+            userInput.style.height = 'auto';
+
+            // Show typing indicator
+            typingIndicator.style.display = 'block';
+            
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                });
+
+                const data = await response.json();
+                
+                // Hide typing indicator
+                typingIndicator.style.display = 'none';
+                
+                // Add bot message
+                appendMessage(data.response, false);
+            } catch (error) {
+                typingIndicator.style.display = 'none';
+                appendMessage('I apologize, but I encountered an error. Please try again.', false);
+            }
+
+            // Re-enable input and button
+            userInput.disabled = false;
+            sendButton.disabled = false;
+            userInput.focus();
+        }
+
+        function formatCodeBlocks(text) {
+            // Pattern to match code blocks with optional language specification
+            const codeBlockRegex = /```(\w+)?\n([\s\S]+?)\n```/g;
+            
+            return text.replace(codeBlockRegex, (match, language, code) => {
+                language = language || 'plaintext';
+                const formattedCode = Prism.highlight(
+                    code.trim(),
+                    Prism.languages[language] || Prism.languages.plaintext,
+                    language
+                );
+                
+                return `<pre class="line-numbers"><button class="copy-button" onclick="copyCode(this)">Copy</button><code class="language-${language}">${formattedCode}</code></pre>`;
+            });
+        }
+
+        function copyCode(button) {
+            const pre = button.parentElement;
+            const code = pre.querySelector('code');
+            const text = code.textContent;
+
+            navigator.clipboard.writeText(text).then(() => {
+                button.textContent = 'Copied!';
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                }, 2000);
+            });
+        }
+
+        function appendMessage(content, isUser) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'message-wrapper';
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            
+            const avatar = document.createElement('div');
+            avatar.className = `avatar ${isUser ? 'user-avatar' : 'bot-avatar'}`;
+            avatar.textContent = isUser ? 'U' : 'T';
+            
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+            
+            // Format code blocks if message is from bot
+            if (!isUser) {
+                messageContent.innerHTML = formatCodeBlocks(content);
+                // Trigger Prism to highlight any new code blocks
+                Prism.highlightAllUnder(messageContent);
+            } else {
+                messageContent.textContent = content;
+            }
+            
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(messageContent);
+            wrapper.appendChild(messageDiv);
+            chatContainer.appendChild(wrapper);
+            
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Focus input on page load
+        userInput.focus();
+    </script>
+</body>
+</html>
